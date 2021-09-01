@@ -1,0 +1,8 @@
+{
+  "documentType": "PurchaseOrder",
+  "typeExtensionRank": 10,
+  "apiVersion": "310",
+  "typeExtensionFunctionName": "runPopulations",
+  "moduleName": "BBBPurchaseOrderPopulation",
+  "event": "onSave"
+}
