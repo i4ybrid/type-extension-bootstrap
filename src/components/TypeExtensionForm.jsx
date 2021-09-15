@@ -1,6 +1,13 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
-import { Button, TextField, CssBaseline, Grid } from '@material-ui/core';
+import {
+  Button,
+  TextField,
+  CssBaseline,
+  Grid,
+  Backdrop,
+  CircularProgress,
+} from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
@@ -39,28 +46,51 @@ const useStyles = makeStyles((theme) => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+  },
 }));
+
+function getElementValue(elementName, fallbackValue) {
+  let returnVal;
+  if (fallbackValue) {
+    returnVal = fallbackValue;
+  }
+  const element = document.getElementById(elementName);
+  if (element) {
+    returnVal = element.value;
+  }
+  return returnVal;
+}
 
 const submitForm = () => {
   const formData = {
-    documentType: 'PurchaseOrder',
-    typeExtensionRank: 10,
-    apiVersion: '310',
-    typeExtensionFunctionName: 'runPopulations',
-    moduleName: 'BBBPurchaseOrderPopulation',
-    event: 'onSave',
+    documentType: getElementValue('documentType'),
+    typeExtensionRank: getElementValue('typeExtensionRank'),
+    apiVersion: getElementValue('apiVersion'),
+    typeExtensionFunctionName: getElementValue('typeExtensionFunctionName'),
+    moduleName: getElementValue('moduleName'),
+    event: getElementValue('event'),
   };
   ipcRenderer.send('buttonClicked', formData);
 };
 
 export default function QuestionForm() {
   const classes = useStyles();
+  const [open, setOpen] = React.useState(false);
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const handleToggle = () => {
+    setOpen(!open);
+  };
 
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.root}>
-        <form className={classes.form}>
+        <form className={classes.form} id="teForm">
           <Grid
             item
             container
@@ -140,6 +170,7 @@ export default function QuestionForm() {
               <Button
                 onClick={() => {
                   submitForm();
+                  handleToggle();
                 }}
               >
                 Submit
@@ -147,6 +178,15 @@ export default function QuestionForm() {
             </Grid>
           </Grid>
         </form>
+      </div>
+      <div>
+        <Backdrop
+          className={classes.backdrop}
+          open={open}
+          onClick={handleClose}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
       </div>
     </Container>
   );

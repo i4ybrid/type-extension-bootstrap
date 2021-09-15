@@ -1,0 +1,20 @@
+<TYPEEXTENSIOND1>
+    <__metadata>
+        <apiVersion>3.1</apiVersion>
+        <type>$TypeExtensionD1</type>
+        <status>Active</status>
+        <userModRev>1</userModRev>
+        <creatorId>-1</creatorId>
+    </__metadata>
+    <type>$TypeExtensionD1</type>
+    <platformModuleType>PlatformModule</platformModuleType>
+    <documentType>{{documentType}}</documentType>
+    <apiVersion>{{apiVersion}}</apiVersion>
+    <status>Active</status>
+    <rank>{{typeExtensionRank}}</rank>
+    <callbacks>
+        <event>{{event}}</event>
+        <role>Buyer</role>
+        <functionName>{{typeExtensionFunctionName}}</functionName>
+    </callbacks>
+</TYPEEXTENSIOND1>

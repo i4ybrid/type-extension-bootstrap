@@ -1,0 +1,13 @@
+<PlatformModule400>
+    <__metadata>
+        <apiVersion>3.1</apiVersion>
+        <type>PlatformModule</type>
+        <status>Active</status>
+    </__metadata>
+    <authorId>-1</authorId>
+    <authorType>Organization</authorType>
+    <ownerType>TradeCustomer</ownerType>
+    <name>{{moduleName}}</name>
+    <scriptExecutionEnvironment>GRAAL</scriptExecutionEnvironment>
+    <userVersion>1.0</userVersion>
+</PlatformModule400>

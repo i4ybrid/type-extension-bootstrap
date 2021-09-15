@@ -1,0 +1,10 @@
+{
+  "PurchaseOrder": {
+    "version": "310",
+    "events": ["onValidate", "onSave"]
+  },
+  "OrderCollab": {
+    "version": "310",
+    "events": ["onValidate", "onSave"]
+  }
+}

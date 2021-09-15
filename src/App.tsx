@@ -1,13 +1,13 @@
 import React from 'react';
 import './App.global.css';
 import NavBar from './components/NavBar';
-import QuestionForm from './components/QuestionForm';
+import TypeExtensionForm from './components/TypeExtensionForm';
 
 function App() {
   return (
     <div className="App">
       <NavBar />
-      <QuestionForm />
+      <TypeExtensionForm />
     </div>
   );
 }

@@ -3,6 +3,7 @@ const fs = require('fs');
 const fse = require('fs-extra');
 const temp = require('temp');
 const { isBinaryFileSync } = require('isbinaryfile');
+const path = require('path');
 const Logger = require('../util/logger');
 
 temp.track();
@@ -17,6 +18,7 @@ async function createTempFolder(folderName) {
 }
 
 async function copyTemplateToTempFolder(tempFolder) {
+  logger.info(path.resolve('../../lib/typeExtension/'));
   await fse.copySync('../../lib/typeExtension/', tempFolder);
 }
 
@@ -88,4 +90,4 @@ module.exports = {
   execute,
 };
 
-execute(require('../../config/typeExtensionSampleConfig.json'));
+// execute(require('../../config/typeExtensionSampleConfig.json'));
