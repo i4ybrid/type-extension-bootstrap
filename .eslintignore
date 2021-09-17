@@ -55,4 +55,4 @@ package.json
 *.sass.d.ts
 *.scss.d.ts
 
-lib//typeExtension/typeExtensionScript/*
+lib/typeExtension/typeExtensionScript/*

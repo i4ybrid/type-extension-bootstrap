@@ -25,9 +25,9 @@ const documents = [
 ];
 
 const events = [
-  { title: 'On Save', value: 'onSave' },
-  { title: 'On Create', version: 'onCreate' },
-  { title: 'On Validate', version: 'onValidate' },
+  { title: 'onSave', value: 'onSave' },
+  { title: 'onCreate', value: 'onCreate' },
+  { title: 'onValidate', value: 'onValidate' },
 ];
 
 const useStyles = makeStyles((theme) => ({
@@ -162,7 +162,7 @@ export default function QuestionForm() {
                 getOptionLabel={(option) => option.title}
                 style={{ width: 300 }}
                 renderInput={(params) => (
-                  <TextField {...params} label="Events" variant="outlined" />
+                  <TextField {...params} label="Event" variant="outlined" />
                 )}
               />
             </Grid>

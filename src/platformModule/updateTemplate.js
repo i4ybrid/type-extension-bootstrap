@@ -2,15 +2,58 @@ const Mustache = require('mustache');
 const fs = require('fs');
 const fse = require('fs-extra');
 const temp = require('temp');
+const JSZip = require('jszip');
 const { isBinaryFileSync } = require('isbinaryfile');
+const { dialog } = require('electron');
 const path = require('path');
-const Logger = require('../util/logger');
+const log = require('electron-log');
 
+const zip = new JSZip();
+const REPLACE = {
+  extensionName: 'EXTENSIONNAME__',
+  extensionType: 'EXTENSION_TYPE__',
+};
 temp.track();
-if (!global.logger) {
-  Logger.makeLogger();
+
+function saveDialog() {
+  // Resolves to a Promise<Object>
+  dialog
+    .showSaveDialog({
+      title: 'Select the File Path to save',
+      defaultPath: path.join(__dirname, '../assets/sample.txt'),
+      // defaultPath: path.join(__dirname, '../assets/'),
+      buttonLabel: 'Save',
+      // Restricting the user to only Text Files.
+      filters: [
+        {
+          name: 'Text Files',
+          extensions: ['txt', 'docx'],
+        },
+      ],
+      properties: [],
+    })
+    .then((file) => {
+      // Stating whether dialog operation was cancelled or not.
+      log.info(file.canceled);
+      if (!file.canceled) {
+        log.info(file.filePath.toString());
+
+        // Creating and Writing to the sample.txt file
+        fs.writeFile(
+          file.filePath.toString(),
+          'This is a Sample File',
+          (err) => {
+            if (err) throw err;
+            log.info('Saved!');
+          }
+        );
+      }
+      return file;
+    })
+    .catch((err) => {
+      log.error(err);
+    });
 }
-const { logger } = global;
 
 async function createTempFolder(folderName) {
   const tempDirectory = temp.mkdirSync(folderName);
@@ -18,25 +61,25 @@ async function createTempFolder(folderName) {
 }
 
 async function copyTemplateToTempFolder(tempFolder) {
-  logger.info(path.resolve('../../lib/typeExtension/'));
-  await fse.copySync('../../lib/typeExtension/', tempFolder);
+  // Needs to be relative to the main.dev.ts
+  await fse.copySync('./lib/typeExtension/', tempFolder);
 }
 
 function replaceText(file, config) {
   const fileContent = fs.readFileSync(file, { encoding: 'utf8', flag: 'r' });
   const contentReplace = Mustache.render(fileContent, config);
-  logger.silly(contentReplace);
+  log.silly(contentReplace);
   // TODO : also rename the files?
   const filenameOutput = Mustache.render(file, config);
   if (file !== filenameOutput) {
-    logger.info(`Replacing file: [${file}] with [${filenameOutput}]`);
+    log.info(`Replacing file: [${file}] with [${filenameOutput}]`);
     fs.unlinkSync(file);
     fs.writeFileSync(filenameOutput, contentReplace);
   } else if (fileContent !== contentReplace) {
     fs.writeFileSync(file, contentReplace);
-    logger.info(`Updating file: [${file}]`);
+    log.info(`Updating file: [${file}]`);
   } else {
-    logger.debug(`No changes for file: [${file}]`);
+    log.debug(`No changes for file: [${file}]`);
   }
 }
 
@@ -46,23 +89,23 @@ function replaceAllFields(tempFolder, config) {
 
   while (fileStack && fileStack.length > 0) {
     const directory = fileStack.pop();
-    logger.debug(`Temp directory = ${directory}`);
+    log.debug(`Temp directory = ${directory}`);
     fs.readdirSync(directory).forEach((file) => {
       const fullFilePath = `${directory}/${file}`;
       const stat = fs.statSync(fullFilePath);
-      logger.debug(`File = ${fullFilePath}`);
+      log.debug(`File = ${fullFilePath}`);
       if (stat.isDirectory()) {
-        logger.debug(`Found directory: ${fullFilePath}`);
+        log.debug(`Found directory: ${fullFilePath}`);
         fileStack.push(fullFilePath);
       } else if (
         stat.isFile() &&
         fs.existsSync(fullFilePath) &&
         !isBinaryFileSync(fullFilePath)
       ) {
-        logger.debug(`Found file: ${fullFilePath}`);
+        log.debug(`Found file: ${fullFilePath}`);
         replacePromises.push(
           new Promise((resolve, reject) => {
-            logger.info(`Added replace promise for ${file}`);
+            log.info(`Added replace promise for ${file}`);
             replaceText(fullFilePath, config);
             resolve();
           })
@@ -73,8 +116,17 @@ function replaceAllFields(tempFolder, config) {
 
   Promise.all(replacePromises)
     .then(() => {
-      // TODO zip up files and move it into output
-      logger.info('Done!');
+      log.info(`Zipping ${tempFolder}`);
+      zip
+        .generateNodeStream({ type: 'nodebuffer', streamFiles: true })
+        .pipe(fs.createWriteStream('out.zip'))
+        .on('finish', () => {
+          saveDialog();
+          // JSZip generates a readable stream with a "end" event,
+          // but is piped here in a writable stream which emits a "finish" event.
+          log.info('out.zip written.');
+        });
+      log.info('Done!');
       return this;
     })
     .catch((err) => {});

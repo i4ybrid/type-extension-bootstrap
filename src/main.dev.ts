@@ -21,6 +21,11 @@ const UpdateTemplate = require('./platformModule/updateTemplate');
 export default class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
+    log.transports.file.format =
+      '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}';
+    log.transports.console.level = 'info';
+    log.transports.console.format =
+      '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}';
     autoUpdater.logger = log;
     autoUpdater.checkForUpdatesAndNotify();
   }
@@ -134,7 +139,6 @@ app.on('activate', () => {
 });
 
 ipcMain.on('buttonClicked', (event, args) => {
-  console.log('Button was clicked, TODO update this');
-  console.log(args);
+  log.debug('Button was clicked, TODO update this');
   UpdateTemplate.execute(args);
 });
