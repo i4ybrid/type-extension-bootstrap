@@ -4,6 +4,8 @@ import { Button, TextField, CssBaseline, Grid } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import DynamicDropdown from './ChangingDropdown';
+import AsyncDropdown from './AsyncDropdown';
 
 const { ipcRenderer } = require('electron');
 
@@ -80,18 +82,10 @@ export default function QuestionForm() {
               />
             </Grid>
             <Grid item>
-              <Autocomplete
+              <DynamicDropdown
                 id="documentType"
                 options={documents}
-                getOptionLabel={(option) => option.title}
-                style={{ width: 300 }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Document Type"
-                    variant="outlined"
-                  />
-                )}
+                label="Document Type"
               />
             </Grid>
             <Grid item>
