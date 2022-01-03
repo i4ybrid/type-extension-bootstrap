@@ -1,6 +1,6 @@
 {
   "ASNType": {
-    "documentType": "ASNType",
+    "documentType": "Gt-AdvanceShipNotice",
     "version": "310",
     "events": [
       { "onAfterSave": ["FreightForwarder", "Customer"] },

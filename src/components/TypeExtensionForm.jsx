@@ -105,13 +105,20 @@ function getElementValue(elementName, fallbackValue) {
 }
 
 const submitForm = () => {
+  console.log(getElementValue('documentType'));
+  console.log(JSON.stringify(documentTypeData));
+
+  const internalDocType =
+    documentTypeData[getElementValue('documentType')].documentType;
+
   const formData = {
-    documentType: getElementValue('documentType'),
+    documentType: internalDocType,
     typeExtensionRank: getElementValue('typeExtensionRank'),
     apiVersion: getElementValue('apiVersion'),
     typeExtensionFunctionName: getElementValue('typeExtensionFunctionName'),
     moduleName: getElementValue('moduleName'),
     event: getElementValue('event'),
+    role: getElementValue('role'),
   };
   ipcRenderer.send('buttonClicked', formData);
 };

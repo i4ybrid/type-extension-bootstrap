@@ -14,7 +14,7 @@
     <rank>{{typeExtensionRank}}</rank>
     <callbacks>
         <event>{{event}}</event>
-        <role>Buyer</role>
+        <role>{{role}}</role>
         <functionName>{{typeExtensionFunctionName}}</functionName>
     </callbacks>
 </TYPEEXTENSIOND1>
