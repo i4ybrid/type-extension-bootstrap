@@ -15,8 +15,11 @@ import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
+import PayloadHelper from './util/payloadHelper';
 
+const globalAny: any = global;
 const UpdateTemplate = require('./platformModule/updateTemplate');
+const CreateCodebase = require('./platformModule/createCodebase');
 
 export default class AppUpdater {
   constructor() {
@@ -138,7 +141,24 @@ app.on('activate', () => {
   if (mainWindow === null) createWindow();
 });
 
-ipcMain.on('buttonClicked', (event, args) => {
-  log.debug('Button was clicked, TODO update this');
-  UpdateTemplate.execute(args);
+ipcMain.on('downloadTypeExtensionZip', async (event, args) => {
+  await UpdateTemplate.execute(globalAny.payload);
+  event.reply('closeOverlay');
+});
+
+ipcMain.on('createSampleCodebase', async (event, args) => {
+  await CreateCodebase.execute(globalAny.payload);
+  event.reply('closeOverlay');
+});
+
+ipcMain.on('saveData', async (event, args) => {
+  globalAny.payload = Object.assign(globalAny.payload || {}, args);
+  PayloadHelper.savePayload(args);
+  event.reply('closeOverlay');
+});
+
+ipcMain.on('getData', async (event) => {
+  globalAny.payload = PayloadHelper.loadPayload();
+  console.log(`main.dev.ts!!! ${JSON.stringify(globalAny.payload)}`);
+  event.returnValue = globalAny.payload;
 });

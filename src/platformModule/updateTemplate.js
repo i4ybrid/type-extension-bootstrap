@@ -29,7 +29,7 @@ function replaceText(file, config) {
   log.silly(contentReplace);
   const fileText = file
     .toString()
-    .replaceAll(REPLACE.extensionType, config.event)
+    .replaceAll(REPLACE.extensionType, config.event.value)
     .replaceAll(REPLACE.extensionName, config.typeExtensionFunctionName);
 
   const filenameOutput = Mustache.render(fileText, config);
@@ -144,7 +144,6 @@ async function execute(config) {
   await replaceAllFields(tempFolder, config);
   const filename = await saveTempToZip(config.moduleName);
   writeZipToFile(tempFolder, filename);
-  // TODO Turn off the overlay
   return tempFolder;
 }
 

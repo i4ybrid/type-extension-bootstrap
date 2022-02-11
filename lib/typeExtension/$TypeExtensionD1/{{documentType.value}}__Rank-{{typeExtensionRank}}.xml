@@ -8,13 +8,13 @@
     </__metadata>
     <type>$TypeExtensionD1</type>
     <platformModuleType>PlatformModule</platformModuleType>
-    <documentType>{{documentType}}</documentType>
-    <apiVersion>{{apiVersion}}</apiVersion>
+    <documentType>{{documentType.value}}</documentType>
+    <apiVersion>{{apiVersion.value}}</apiVersion>
     <status>Active</status>
     <rank>{{typeExtensionRank}}</rank>
     <callbacks>
-        <event>{{event}}</event>
-        <role>{{role}}</role>
+        <event>{{event.value}}</event>
+        <role>{{role.value}}</role>
         <functionName>{{typeExtensionFunctionName}}</functionName>
     </callbacks>
 </TYPEEXTENSIOND1>

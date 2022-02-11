@@ -1,24 +1,28 @@
 import React from 'react';
 import clsx from 'clsx';
-import { makeStyles, fade, useTheme } from '@material-ui/core/styles';
+import { makeStyles, alpha, useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import Divider from '@material-ui/core/Divider';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import InputBase from '@material-ui/core/InputBase';
+import Divider from '@material-ui/core/Divider';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import DockIcon from '@material-ui/icons/Dock';
+import CodeIcon from '@material-ui/icons/Code';
+import BugReportIcon from '@material-ui/icons/BugReport';
+import InboxIcon from '@material-ui/icons/MoveToInbox';
+import MailIcon from '@material-ui/icons/Mail';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
+import { Link } from 'react-router-dom';
 
 const drawerWidth = 240;
 
@@ -88,9 +92,9 @@ const useStyles = makeStyles((theme) => ({
   search: {
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
-    backgroundColor: fade(theme.palette.common.white, 0.15),
+    backgroundColor: alpha(theme.palette.common.white, 0.15),
     '&:hover': {
-      backgroundColor: fade(theme.palette.common.white, 0.25),
+      backgroundColor: alpha(theme.palette.common.white, 0.25),
     },
     marginLeft: 0,
     width: '100%',
@@ -198,14 +202,39 @@ export default function NavBar() {
         </div>
         <Divider />
         <List>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-            <ListItem button key={text}>
+          <Link
+            to="/typeExtension"
+            style={{ color: 'inherit', textDecoration: 'none' }}
+          >
+            <ListItem button key="Platform Module">
               <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                <DockIcon />
               </ListItemIcon>
-              <ListItemText primary={text} />
+              <ListItemText primary="Platform Module" />
             </ListItem>
-          ))}
+          </Link>
+          <Link
+            to="/codebase"
+            style={{ color: 'inherit', textDecoration: 'none' }}
+          >
+            <ListItem button key="Codebase">
+              <ListItemIcon>
+                <CodeIcon />
+              </ListItemIcon>
+              <ListItemText primary="Codebase" />
+            </ListItem>
+          </Link>
+          <Link
+            to="/unitTest"
+            style={{ color: 'inherit', textDecoration: 'none' }}
+          >
+            <ListItem button key="Unit Test">
+              <ListItemIcon>
+                <BugReportIcon />
+              </ListItemIcon>
+              <ListItemText primary="Unit Test" />
+            </ListItem>
+          </Link>
         </List>
         <Divider />
         <List>

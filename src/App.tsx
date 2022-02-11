@@ -1,15 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Outlet } from 'react-router-dom';
 import './App.global.css';
 import NavBar from './components/NavBar';
-import TypeExtensionForm from './components/TypeExtensionForm';
+import { AppProvider } from './components/AppContext';
 
-function App() {
+export default function App() {
   return (
     <div className="App">
       <NavBar />
-      <TypeExtensionForm />
+      <AppProvider>
+        <Outlet />
+      </AppProvider>
     </div>
   );
 }
-
-export default App;
