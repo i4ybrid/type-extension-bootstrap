@@ -36,7 +36,7 @@ class Asynchronous extends React.Component {
         multiline
         style={{ width: 380 }}
         minRows={2}
-        rowsMax={8}
+        maxRows={8}
         id={id}
         label={label}
         name={id}

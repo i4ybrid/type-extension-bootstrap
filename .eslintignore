@@ -56,4 +56,5 @@ package.json
 *.scss.d.ts
 
 lib/typeExtension/typeExtensionScript/*
-lib/unitTest/*
+lib/unitTestNoSeed/*
+lib/unitTestWithSeed/*

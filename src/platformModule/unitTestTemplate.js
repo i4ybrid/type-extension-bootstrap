@@ -5,6 +5,7 @@ const fse = require('fs-extra');
 const temp = require('temp');
 const { isBinaryFileSync } = require('isbinaryfile');
 const log = require('electron-log');
+const { endSlash, createFolders } = require('./fileUtils');
 
 const REPLACE = {
   extensionName: 'EXTENSIONNAME__',
@@ -22,43 +23,32 @@ async function createTempFolder(folderName) {
   return tempDirectory;
 }
 
-async function copyTemplateToFolder(tempFolder) {
+async function copyTemplateToFolder(template, tempFolder) {
   // Needs to be relative to the main.dev.ts
-  await fse.copySync('./lib/typeExtension/', tempFolder);
+  await fse.copySync(template, tempFolder);
 }
 
-async function copyTempToCustomerFolder(tempFolder, config) {
+async function copyTempToTestFolder(tempFolder, config) {
   let { platformModuleFolder, customerKey } = config;
   if (typeof platformModuleFolder === 'string') {
     platformModuleFolder = platformModuleFolder.replace('~', process.env.HOME);
   }
-  if (
-    typeof platformModuleFolder === 'string' &&
-    !platformModuleFolder.endsWith('/')
-  ) {
-    platformModuleFolder = `${platformModuleFolder}/`;
-  }
-  if (typeof customerKey === 'string' && !customerKey.endsWith('/')) {
-    customerKey = `${customerKey}/`;
-  }
-  const customerFolder = `${platformModuleFolder}customer/${customerKey}`;
-  const fullPlatformFolder = `${platformModuleFolder}customer/${customerKey}${config.moduleName}`;
-  if (!fs.existsSync(customerFolder)) {
-    fs.mkdirSync(customerFolder);
-  }
-  if (!fs.existsSync(fullPlatformFolder)) {
-    fs.mkdirSync(fullPlatformFolder);
-  }
+  platformModuleFolder = endSlash(platformModuleFolder);
+  customerKey = endSlash(customerKey);
+  const fullTestFolder = `${platformModuleFolder}test/customer/${customerKey}${config.moduleName}`;
+  createFolders(fullTestFolder, platformModuleFolder);
+
   log.info(
-    `copyTempToCustomerFolder: Copying data to the following older: [${fullPlatformFolder}]`
+    `copyTempToCustomerFolder: Copying data to the following older: [${fullTestFolder}]`
   );
-  await fse.copySync(tempFolder, fullPlatformFolder, { overwrite: true });
+  await fse.copySync(tempFolder, fullTestFolder, { overwrite: false });
 }
 
 function replaceText(file, config) {
   const fileContent = fs.readFileSync(file, { encoding: 'utf8', flag: 'r' });
   const contentReplace = Mustache.render(fileContent, config);
   log.silly(contentReplace);
+
   const fileText = file
     .toString()
     .replaceAll(REPLACE.extensionType, config.event.value)
@@ -146,16 +136,24 @@ function determineKey(seedData) {
 
 async function createTypeExtensionTest(config) {
   // TOOD Complete this
-  log.info(config);
-  const tempFolder = await createTempFolder(config.moduleName);
-  await copyTemplateToFolder(tempFolder);
-  await replaceAllFields(tempFolder, config);
-  await copyTempToCustomerFolder(tempFolder, config);
+  let configCopy = { ...config };
+  log.info(configCopy);
+  const containsSeed = !isEmpty(configCopy.seedData);
+  const templateFolder = containsSeed
+    ? './lib/unitTestWithSeed/'
+    : './lib/unitTestNoSeed/';
+  if (containsSeed) {
+    const keyedSeedData = determineKey(config.seedData);
+    configCopy = Object.assign(config, { formattedSeedData: keyedSeedData });
+  }
+  const tempFolder = await createTempFolder(configCopy.moduleName);
+  await copyTemplateToFolder(templateFolder, tempFolder);
+  await replaceAllFields(tempFolder, configCopy);
+  await copyTempToTestFolder(tempFolder, configCopy);
   return tempFolder;
 }
 
 module.exports = {
-  determineKey,
   createTypeExtensionTest,
 };
 

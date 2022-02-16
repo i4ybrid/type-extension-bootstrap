@@ -49,7 +49,7 @@ async function copyTempToCustomerFolder(tempFolder, config) {
   log.info(
     `copyTempToCustomerFolder: Copying data to the following older: [${fullPlatformFolder}]`
   );
-  await fse.copySync(tempFolder, fullPlatformFolder, { overwrite: true });
+  await fse.copySync(tempFolder, fullPlatformFolder, { overwrite: false });
 }
 
 function replaceText(file, config) {

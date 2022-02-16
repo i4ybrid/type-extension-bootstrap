@@ -19,6 +19,7 @@ import PayloadHelper from './util/payloadHelper';
 
 const globalAny: any = global;
 const UpdateTemplate = require('./platformModule/updateTemplate');
+const UnitTestTemplate = require('./platformModule/unitTestTemplate');
 
 export default class AppUpdater {
   constructor() {
@@ -151,6 +152,13 @@ ipcMain.on('createTypeExtensionFolder', async (event, args) => {
   globalAny.payload = Object.assign(globalAny.payload || {}, args);
   PayloadHelper.savePayload(args);
   await UpdateTemplate.createTypeExtensionFolder(globalAny.payload);
+  event.reply('closeOverlay');
+});
+
+ipcMain.on('createTypeExtensionTest', async (event, args) => {
+  globalAny.payload = Object.assign(globalAny.payload || {}, args);
+  PayloadHelper.savePayload(args);
+  await UnitTestTemplate.createTypeExtensionTest(globalAny.payload);
   event.reply('closeOverlay');
 });
 

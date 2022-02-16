@@ -35,8 +35,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const createTypeExtensionFolder = (payload) => {
-  ipcRenderer.send('createTypeExtensionFolder', payload);
+const createTypeExtensionTest = (payload) => {
+  ipcRenderer.send('createTypeExtensionTest', payload);
 };
 
 const saveData = (payload) => {
@@ -48,7 +48,7 @@ const minify = (text) => {
     const jsonObject = JSON.parse(text);
     return JSON.stringify(jsonObject);
   } catch (e) {}
-  return undefined;
+  return text;
 };
 
 const beautify = (text) => {
@@ -56,7 +56,7 @@ const beautify = (text) => {
     const jsonObject = JSON.parse(text);
     return JSON.stringify(jsonObject, null, 2);
   } catch (e) {}
-  return undefined;
+  return text;
 };
 
 export default function StatefulForm() {
@@ -113,7 +113,7 @@ export default function StatefulForm() {
               <Button
                 onClick={() => {
                   saveData(payload);
-                  createTypeExtensionFolder(payload);
+                  createTypeExtensionTest(payload);
                   toggleOverlay();
                   setTimeout(closeOverlay, 2500);
                 }}
@@ -125,7 +125,7 @@ export default function StatefulForm() {
               <AsyncMultiline
                 id="targetObjectData"
                 label="Target Object Data"
-                val={payload.testData}
+                val={payload.targetObjectData}
                 onValueChange={(newValue) => {
                   payload.targetObjectData = newValue;
                 }}
@@ -135,6 +135,7 @@ export default function StatefulForm() {
               <Button
                 onClick={() => {
                   payload.targetObjectData = minify(payload.targetObjectData);
+                  payload.seedData = minify(payload.seedData);
                   // TODO trigger refresh using useState
                 }}
               >
@@ -145,6 +146,7 @@ export default function StatefulForm() {
               <Button
                 onClick={() => {
                   payload.targetObjectData = beautify(payload.targetObjectData);
+                  payload.seedData = beautify(payload.seedData);
                   // TODO trigger refresh using useState
                 }}
               >
