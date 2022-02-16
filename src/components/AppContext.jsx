@@ -1,5 +1,4 @@
-import { useTheme } from '@material-ui/core';
-import React, { useState, useContext, useCallback, useRef } from 'react';
+import React, { useContext } from 'react';
 
 const { ipcRenderer } = require('electron');
 

@@ -46,7 +46,6 @@ const saveData = (payload) => {
 };
 
 const downloadPlatormModuleZip = (payload) => {
-  ipcRenderer.send('saveData', payload);
   ipcRenderer.send('downloadTypeExtensionZip');
 };
 
@@ -155,7 +154,6 @@ export default function TypeExtensionForm() {
             <Grid item>
               <Button
                 onClick={() => {
-                  console.log(JSON.stringify(payload, null, 2));
                   saveData(payload);
                 }}
               >
@@ -177,6 +175,7 @@ export default function TypeExtensionForm() {
             <Grid item>
               <Button
                 onClick={() => {
+                  saveData(payload);
                   downloadPlatormModuleZip(payload);
                   toggleOverlay();
                 }}

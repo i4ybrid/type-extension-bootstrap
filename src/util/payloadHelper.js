@@ -29,6 +29,8 @@ const PAYLOAD_TEMPLATE = {
   },
   platformModuleFolder: '~/code/gtnexus/platform/',
   customerKey: null,
+  targetObjectData: null,
+  seedData: null,
 };
 
 function supplementPayload(payload) {
@@ -42,20 +44,28 @@ function supplementPayload(payload) {
     role,
     platformModuleFolder,
     customerKey,
+    targetObjectData,
+    seedData,
   } = PAYLOAD_TEMPLATE;
 
-  return {
-    apiVersion: Object.assign(apiVersion, payload.apiVersion),
-    documentType: Object.assign(documentType, payload.documentType),
-    typeExtensionRank: payload.typeExtensionRank || typeExtensionRank,
-    typeExtensionFunctionName:
-      payload.typeExtensionFunctionName || typeExtensionFunctionName,
-    moduleName: payload.moduleName || moduleName,
-    event: Object.assign(event, payload.event),
-    role: Object.assign(role, payload.role),
-    platformModuleFolder: payload.platformModuleFolder || platformModuleFolder,
-    customerKey: payload.customerKey || customerKey,
-  };
+  if (payload) {
+    return {
+      apiVersion: Object.assign(apiVersion, payload.apiVersion),
+      documentType: Object.assign(documentType, payload.documentType),
+      typeExtensionRank: payload.typeExtensionRank || typeExtensionRank,
+      typeExtensionFunctionName:
+        payload.typeExtensionFunctionName || typeExtensionFunctionName,
+      moduleName: payload.moduleName || moduleName,
+      event: Object.assign(event, payload.event),
+      role: Object.assign(role, payload.role),
+      platformModuleFolder:
+        payload.platformModuleFolder || platformModuleFolder,
+      customerKey: payload.customerKey || customerKey,
+      targetObjectData: payload.targetObjectData || targetObjectData,
+      seedData: payload.seedData || seedData,
+    };
+  }
+  return { ...PAYLOAD_TEMPLATE };
 }
 
 function loadPayload() {

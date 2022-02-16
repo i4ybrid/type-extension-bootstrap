@@ -1,15 +1,14 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable react/jsx-props-no-spreading */
-import React, { useCallback } from 'react';
+import React from 'react';
 import {
   Button,
-  TextField,
   CssBaseline,
   Grid,
   Backdrop,
   CircularProgress,
 } from '@material-ui/core';
-import { makeStyles, alpha } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import AsyncDropdown from '../components/AsyncDropdown';
 import AsyncTextField from '../components/AsyncTextField';
@@ -17,12 +16,7 @@ import { usePayload } from '../components/AppContext';
 
 const { ipcRenderer } = require('electron');
 const documentTypeData = require('../../lib/constants/documentTypes.json');
-const {
-  flattenDocuments,
-  flattenEvents,
-  flattenRoles,
-  inlineReplaceArray,
-} = require('../util/pageUtils');
+const { flattenRoles, inlineReplaceArray } = require('../util/pageUtils');
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -42,8 +36,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const downloadPlatormModuleZip = () => {
-  ipcRenderer.send('downloadTypeExtensionZip');
+const createTypeExtensionFolder = (payload) => {
+  ipcRenderer.send('createTypeExtensionFolder', payload);
+};
+
+const saveData = (payload) => {
+  ipcRenderer.send('saveData', payload);
 };
 
 export default function StatefulForm() {
@@ -116,6 +114,15 @@ export default function StatefulForm() {
               />
             </Grid>
             <Grid item>
+              <Button
+                onClick={() => {
+                  saveData(payload);
+                }}
+              >
+                Save
+              </Button>
+            </Grid>
+            <Grid item>
               <AsyncDropdown
                 id="role"
                 options={payload.role.options}
@@ -130,8 +137,10 @@ export default function StatefulForm() {
             <Grid item>
               <Button
                 onClick={() => {
-                  console.log(JSON.stringify(payload, null, 2));
+                  saveData(payload);
+                  createTypeExtensionFolder(payload);
                   toggleOverlay();
+                  setTimeout(closeOverlay, 2500);
                 }}
               >
                 Submit

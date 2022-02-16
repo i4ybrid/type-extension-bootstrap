@@ -19,7 +19,6 @@ import PayloadHelper from './util/payloadHelper';
 
 const globalAny: any = global;
 const UpdateTemplate = require('./platformModule/updateTemplate');
-const CreateCodebase = require('./platformModule/createCodebase');
 
 export default class AppUpdater {
   constructor() {
@@ -142,12 +141,16 @@ app.on('activate', () => {
 });
 
 ipcMain.on('downloadTypeExtensionZip', async (event, args) => {
-  await UpdateTemplate.execute(globalAny.payload);
+  globalAny.payload = Object.assign(globalAny.payload || {}, args);
+  PayloadHelper.savePayload(args);
+  await UpdateTemplate.createTypeExtensionZip(globalAny.payload);
   event.reply('closeOverlay');
 });
 
-ipcMain.on('createSampleCodebase', async (event, args) => {
-  await CreateCodebase.execute(globalAny.payload);
+ipcMain.on('createTypeExtensionFolder', async (event, args) => {
+  globalAny.payload = Object.assign(globalAny.payload || {}, args);
+  PayloadHelper.savePayload(args);
+  await UpdateTemplate.createTypeExtensionFolder(globalAny.payload);
   event.reply('closeOverlay');
 });
 
@@ -159,6 +162,5 @@ ipcMain.on('saveData', async (event, args) => {
 
 ipcMain.on('getData', async (event) => {
   globalAny.payload = PayloadHelper.loadPayload();
-  console.log(`main.dev.ts!!! ${JSON.stringify(globalAny.payload)}`);
   event.returnValue = globalAny.payload;
 });

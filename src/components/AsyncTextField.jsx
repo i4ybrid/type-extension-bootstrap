@@ -1,6 +1,6 @@
 /* eslint-disable react/forbid-prop-types */
 // *https://www.registers.service.gov.uk/registers/country/use-the-api*
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import PropTypes from 'prop-types';
 
@@ -46,13 +46,13 @@ Asynchronous.propTypes = {
   id: PropTypes.string.isRequired,
   val: PropTypes.string,
   label: PropTypes.string,
-  onValueChange: PropTypes.any,
+  onValueChange: PropTypes.func,
 };
 
 Asynchronous.defaultProps = {
   val: '',
   label: '',
-  onValueChange: undefined,
+  onValueChange: () => {},
 };
 
 export default Asynchronous;

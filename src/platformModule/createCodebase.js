@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 const Mustache = require('mustache');
 const fs = require('fs');
 const fse = require('fs-extra');
@@ -10,7 +11,6 @@ const archiver = require('archiver');
 const REPLACE = {
   extensionName: 'EXTENSIONNAME__',
   extensionType: 'EXTENSIONTYPE__',
-  documentTypeLabel: 'DOCUMENTTYPELABEL__',
 };
 temp.track();
 
@@ -19,37 +19,9 @@ async function createTempFolder(folderName) {
   return tempDirectory;
 }
 
-async function copyTemplateToFolder(tempFolder) {
+async function copyTemplateToTempFolder(tempFolder) {
   // Needs to be relative to the main.dev.ts
   await fse.copySync('./lib/typeExtension/', tempFolder);
-}
-
-async function copyTempToCustomerFolder(tempFolder, config) {
-  let { platformModuleFolder, customerKey } = config;
-  if (typeof platformModuleFolder === 'string') {
-    platformModuleFolder = platformModuleFolder.replace('~', process.env.HOME);
-  }
-  if (
-    typeof platformModuleFolder === 'string' &&
-    !platformModuleFolder.endsWith('/')
-  ) {
-    platformModuleFolder = `${platformModuleFolder}/`;
-  }
-  if (typeof customerKey === 'string' && !customerKey.endsWith('/')) {
-    customerKey = `${customerKey}/`;
-  }
-  const customerFolder = `${platformModuleFolder}customer/${customerKey}`;
-  const fullPlatformFolder = `${platformModuleFolder}customer/${customerKey}${config.moduleName}`;
-  if (!fs.existsSync(customerFolder)) {
-    fs.mkdirSync(customerFolder);
-  }
-  if (!fs.existsSync(fullPlatformFolder)) {
-    fs.mkdirSync(fullPlatformFolder);
-  }
-  log.info(
-    `copyTempToCustomerFolder: Copying data to the following older: [${fullPlatformFolder}]`
-  );
-  await fse.copySync(tempFolder, fullPlatformFolder, { overwrite: true });
 }
 
 function replaceText(file, config) {
@@ -58,9 +30,8 @@ function replaceText(file, config) {
   log.silly(contentReplace);
   const fileText = file
     .toString()
-    .replaceAll(REPLACE.extensionType, config.event.value)
-    .replaceAll(REPLACE.extensionName, config.typeExtensionFunctionName)
-    .replaceAll(REPLACE.documentTypeLabel, config.documentType.label);
+    .replaceAll(REPLACE.extensionType, config.event)
+    .replaceAll(REPLACE.extensionName, config.typeExtensionFunctionName);
 
   const filenameOutput = Mustache.render(fileText, config);
   if (file.toString() !== filenameOutput) {
@@ -96,7 +67,7 @@ function replaceAllFields(tempFolder, config) {
       ) {
         log.debug(`Found file: ${fullFilePath}`);
         replacePromises.push(
-          new Promise((resolve) => {
+          new Promise((resolve, reject) => {
             log.debug(`Added replace promise for ${file}`);
             replaceText(fullFilePath, config);
             resolve();
@@ -167,28 +138,60 @@ function saveTempToZip(moduleName) {
     });
 }
 
-async function createTypeExtensionZip(config) {
+function copyFolderToLocation(tempFolder, config) {
+  if (!config.platformModuleFolder) {
+    log.error('platform module folder not defined');
+    return false;
+  }
+  if (!config.customerKey) {
+    log.error('customer key is not defined');
+    return false;
+  }
+  if (!config.moduleName) {
+    log.error('module name is not defined');
+    return false;
+  }
+  const { customerKey, platformModuleFolder, moduleName } = config;
+
+  const pmHomeFolder = platformModuleFolder.charAt(-1) !== '/' ? `${platformModuleFolder}/` : `${platformModuleFolder}`;
+  const customer = customerKey.charAt(-1) !== '/' ? `${customerKey}/` : `${customerKey}`;
+  const module = moduleName.charAt(-1) !== '/' ? `${moduleName}/` : `${moduleName}`;
+  const customerFolder = pmHomeFolder + customer;
+  if (!fs.existsSync(customerFolder)) {
+    fs.mkdirSync(customerFolder);
+  }
+  const platformFolder = customerFolder + module;
+  if (!fs.existsSync(platformFolder)) {
+    fs.mkdirSync(platformFolder);
+  }
+  let didErrorHappen = false;
+  fse.copySync(tempFolder, platformFolder, (err) => {
+    if (err) {
+      log.error(`Error when copying files to platform module\n${err}`);
+      didErrorHappen = true;
+    }
+  });
+  return !didErrorHappen;
+}
+
+async function execute(config) {
   log.info(config);
   const tempFolder = await createTempFolder(config.moduleName);
-  await copyTemplateToFolder(tempFolder);
+  await copyTemplateToTempFolder(tempFolder);
   await replaceAllFields(tempFolder, config);
   const filename = await saveTempToZip(config.moduleName);
   writeZipToFile(tempFolder, filename);
-  return tempFolder;
-}
-
-async function createTypeExtensionFolder(config) {
-  log.info(config);
-  const tempFolder = await createTempFolder(config.moduleName);
-  await copyTemplateToFolder(tempFolder);
-  await replaceAllFields(tempFolder, config);
-  await copyTempToCustomerFolder(tempFolder, config);
+  const success = copyFolderToLocation(tempFolder, config);
+  if (success) {
+    log.info('Created codebase successfully');
+  } else {
+    log.error('Failed codebase creation');
+  }
   return tempFolder;
 }
 
 module.exports = {
-  createTypeExtensionZip,
-  createTypeExtensionFolder,
+  execute,
 };
 
 // execute(require('../../config/typeExtensionSampleConfig.json'));

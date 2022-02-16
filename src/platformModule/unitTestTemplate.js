@@ -1,11 +1,10 @@
+/* eslint-disable no-underscore-dangle */
 const Mustache = require('mustache');
 const fs = require('fs');
 const fse = require('fs-extra');
 const temp = require('temp');
 const { isBinaryFileSync } = require('isbinaryfile');
-const { dialog } = require('electron');
 const log = require('electron-log');
-const archiver = require('archiver');
 
 const REPLACE = {
   extensionName: 'EXTENSIONNAME__',
@@ -13,6 +12,10 @@ const REPLACE = {
   documentTypeLabel: 'DOCUMENTTYPELABEL__',
 };
 temp.track();
+
+function isEmpty(obj) {
+  return !obj || Object.keys(obj) === 0;
+}
 
 async function createTempFolder(folderName) {
   const tempDirectory = temp.mkdirSync(folderName);
@@ -111,73 +114,38 @@ function replaceAllFields(tempFolder, config) {
   });
 }
 
-function writeZipToFile(tempFolder, file) {
-  log.info(`Writing file: ${file.filePath.toString()}`);
-  log.info(`Zipping ${tempFolder}`);
+function determineKey(seedData) {
+  const returnVal = {};
+  let seedDataArray = [];
+  if (seedData instanceof Array) {
+    seedDataArray = seedData;
+  } else {
+    seedDataArray.push(seedData);
+  }
 
-  const output = fs.createWriteStream(file.filePath.toString());
-  const archive = archiver('zip', {
-    zlib: { level: 9 }, // Sets the compression level.
-  });
-
-  output.on('end', () => {
-    log.debug('Data has been drained');
-  });
-
-  output.on('close', () => {
-    log.debug(`${archive.pointer()} total bytes`);
-    log.debug(
-      'archiver has been finalized and the output file descriptor has closed.'
-    );
-  });
-
-  archive.on('warning', (err) => {
-    if (err.code === 'ENOENT') {
-      log.warn(err);
-    } else {
-      throw err;
+  seedDataArray.forEach((seedString) => {
+    let seedObject;
+    try {
+      seedObject = JSON.parse(seedString);
+      // eslint-disable-next-line no-empty
+    } catch (e) {}
+    if (seedObject && seedObject.__metadata && seedObject.__metadata.self) {
+      const selfUrl = seedObject.__metadata.self;
+      let queryKey;
+      if (selfUrl.indexOf('query') >= 0 && selfUrl.indexOf('rest') >= 0) {
+        queryKey = selfUrl.slice(selfUrl.indexOf('rest'));
+      } else {
+        queryKey = selfUrl.slice(selfUrl.lastIndexOf('/') + 1);
+      }
+      returnVal[queryKey] = seedObject;
     }
   });
-  archive.on('error', (err) => {
-    throw err;
-  });
-  archive.pipe(output);
-  archive.directory(tempFolder, false);
-  archive.finalize();
-  return true;
+
+  return JSON.stringify(returnVal);
 }
 
-function saveTempToZip(moduleName) {
-  // Resolves to a Promise<Object>
-  return dialog
-    .showSaveDialog({
-      title: 'Select the File Path to save',
-      buttonLabel: 'Save',
-      defaultPath: `${moduleName}.zip`,
-      filters: [
-        {
-          name: 'Zip Files',
-          extensions: ['zip'],
-        },
-      ],
-      properties: [],
-    })
-    .catch((err) => {
-      log.error(err);
-    });
-}
-
-async function createTypeExtensionZip(config) {
-  log.info(config);
-  const tempFolder = await createTempFolder(config.moduleName);
-  await copyTemplateToFolder(tempFolder);
-  await replaceAllFields(tempFolder, config);
-  const filename = await saveTempToZip(config.moduleName);
-  writeZipToFile(tempFolder, filename);
-  return tempFolder;
-}
-
-async function createTypeExtensionFolder(config) {
+async function createTypeExtensionTest(config) {
+  // TOOD Complete this
   log.info(config);
   const tempFolder = await createTempFolder(config.moduleName);
   await copyTemplateToFolder(tempFolder);
@@ -187,8 +155,8 @@ async function createTypeExtensionFolder(config) {
 }
 
 module.exports = {
-  createTypeExtensionZip,
-  createTypeExtensionFolder,
+  determineKey,
+  createTypeExtensionTest,
 };
 
 // execute(require('../../config/typeExtensionSampleConfig.json'));
