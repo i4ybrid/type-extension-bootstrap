@@ -1,7 +1,3 @@
-<img src=".erb/img/erb-banner.png" width="100%" />
-
-<br>
-
 <p>
   Type Extension Bootstrap Tool for Infor Nexus Developers
   <a href="https://developer.infornexus.com/">Infor Nexus Developer Network</a>
@@ -48,6 +44,8 @@ yarn package
 - Remove extra icons on the left navbar
 - Allow for multiple seed documents
 - Move README.md
+- Add the ability to query REST directly and load it into the test data
+- Move to web application? (remove Electron)
 
 ## Open Bugs
 
@@ -55,6 +53,7 @@ yarn package
 - When manually deleting fields, we are getting an error pop up Cannot read property 'documentType' of undefined
 - Roles sometimes doesn't seem to update when updating Event
 - Seed data is ALWAYS generated, even when it's empty
+- Error when settings folder is not created?
 
 ## Maintainers
 

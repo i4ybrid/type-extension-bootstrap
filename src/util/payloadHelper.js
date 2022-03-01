@@ -86,7 +86,7 @@ function loadPayload() {
     }
   }
 
-  return returnVal;
+  return supplementPayload(returnVal);
 }
 
 function savePayload(payload) {
