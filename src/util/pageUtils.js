@@ -26,22 +26,21 @@ function flattenEvents(dataSet, filterDocument) {
   return returnValue;
 }
 
-function flattenRoles(dataSet, filterEvent) {
-  const returnValue = ['Buyer', 'Seller'];
-
-  Object.values(dataSet).forEach((document) => {
-    Object.values(document.events).forEach((events) => {
-      events.forEach((event) => {
+function flattenRoles(dataSet, filterDocument, filterEvent) {
+  const returnValue = [];
+  if (dataSet[filterDocument] && dataSet[filterDocument].events) {
+    Object.keys(dataSet[filterDocument].events).forEach((event) => {
+      const eventRoles = dataSet[filterDocument].events[event];
+      eventRoles.forEach((role) => {
         if (
-          (!filterEvent || filterEvent === event) &&
-          returnValue.indexOf(event) < 0
+          (!filterEvent || event === filterEvent) &&
+          returnValue.indexOf(role) < 0
         ) {
-          returnValue.push(event);
+          returnValue.push(role);
         }
       });
     });
-  });
-
+  }
   return returnValue;
 }
 

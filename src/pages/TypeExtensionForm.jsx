@@ -144,7 +144,11 @@ export default function TypeExtensionForm() {
                   payload.event.value = newEvent;
                   inlineReplaceArray(
                     payload.role.options,
-                    flattenRoles(documentTypeData, newEvent)
+                    flattenRoles(
+                      documentTypeData,
+                      payload.documentType.label,
+                      newEvent
+                    )
                   );
                   payload.role.value = '';
                   payload.role.label = '';
